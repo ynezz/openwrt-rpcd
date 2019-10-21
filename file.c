@@ -629,7 +629,8 @@ static const char *
 rpc_file_exec_lookup(const char *cmd)
 {
 	struct stat s;
-	int plen = 0, clen = strlen(cmd) + 1;
+	size_t plen = 0;
+	size_t clen = strlen(cmd) + 1;
 	char *search, *p;
 	static char path[PATH_MAX];
 
@@ -929,6 +930,7 @@ rpc_file_exec_run(const char *cmd, const struct blob_attr *sid,
 		if (execv(executable, args))
 			return rpc_errno_status();
 
+		/* fall through */
 	default:
 		memset(c, 0, sizeof(*c));
 

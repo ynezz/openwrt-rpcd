@@ -453,6 +453,7 @@ rpc_plugin_register_exec(struct ubus_context *ctx, const char *path)
 		if (execl(path, path, "list", NULL))
 			return UBUS_STATUS_UNKNOWN_ERROR;
 
+		/* fall through */
 	default:
 		plugin = rpc_plugin_parse_exec(name + 1, fds[0]);
 

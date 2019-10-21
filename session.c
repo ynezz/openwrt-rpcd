@@ -151,7 +151,7 @@ rpc_random(char *dest)
 {
 	unsigned char buf[16] = { 0 };
 	FILE *f;
-	int i;
+	size_t i;
 	int ret;
 
 	f = fopen("/dev/urandom", "r");
@@ -1073,7 +1073,7 @@ out:
 static void
 rpc_login_setup_acls(struct rpc_session *ses, struct uci_section *login)
 {
-	int i;
+	size_t i;
 	glob_t gl;
 
 	if (glob(RPC_SESSION_ACL_DIR "/*.json", 0, NULL, &gl))
@@ -1194,7 +1194,8 @@ rpc_validate_sid(const char *id)
 static int
 rpc_blob_to_file(const char *path, struct blob_attr *attr)
 {
-	int fd, len;
+	int fd;
+	size_t len;
 
 	fd = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
 
@@ -1217,7 +1218,8 @@ rpc_blob_to_file(const char *path, struct blob_attr *attr)
 static struct blob_attr *
 rpc_blob_from_file(const char *path)
 {
-	int fd = -1, len;
+	int fd = -1;
+	size_t len;
 	struct stat s;
 	struct blob_attr head, *attr = NULL;
 
@@ -1231,7 +1233,7 @@ rpc_blob_from_file(const char *path)
 
 	len = read(fd, &head, sizeof(head));
 
-	if (len != sizeof(head) || blob_pad_len(&head) != s.st_size)
+	if (len != sizeof(head) || blob_pad_len(&head) != (size_t) s.st_size)
 		goto fail;
 
 	attr = calloc(1, s.st_size);

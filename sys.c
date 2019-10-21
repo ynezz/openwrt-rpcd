@@ -134,6 +134,7 @@ rpc_cgi_password_set(struct ubus_context *ctx, struct ubus_object *obj,
 		          blobmsg_data(tb[RPC_P_USER]), NULL))
 			return rpc_errno_status();
 
+		/* fall through */
 	default:
 		close(fds[0]);
 

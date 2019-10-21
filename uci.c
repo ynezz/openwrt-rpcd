@@ -1476,7 +1476,8 @@ static int
 rpc_uci_apply_access(const char *sid, glob_t *gl)
 {
 	struct stat s;
-	int i, c = 0;
+	size_t i;
+	int c = 0;
 
 	if (gl->gl_pathc < 3)
 		return UBUS_STATUS_NO_DATA;
@@ -1502,7 +1503,8 @@ rpc_uci_apply_access(const char *sid, glob_t *gl)
 static void
 rpc_uci_do_rollback(struct ubus_context *ctx, glob_t *gl)
 {
-	int i, deny;
+	size_t i;
+	int deny;
 	char tmp[PATH_MAX];
 
 	/* Test apply permission to see if the initiator session still exists.
@@ -1566,7 +1568,8 @@ rpc_uci_apply(struct ubus_context *ctx, struct ubus_object *obj,
 	int timeout = RPC_APPLY_TIMEOUT;
 	char tmp[PATH_MAX];
 	bool rollback = false;
-	int ret, i;
+	int ret;
+	size_t i;
 	char *sid;
 	glob_t gl;
 
@@ -1740,7 +1743,7 @@ rpc_uci_purge_savedir_cb(struct rpc_session *ses, void *priv)
  */
 void rpc_uci_purge_savedirs(void)
 {
-	int i;
+	size_t i;
 	glob_t gl;
 
 	if (!glob(RPC_UCI_SAVEDIR_PREFIX "*", 0, NULL, &gl))
