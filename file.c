@@ -625,7 +625,8 @@ static const char *
 rpc_file_exec_lookup(const char *cmd)
 {
 	struct stat s;
-	int plen = 0, clen = strlen(cmd) + 1;
+	size_t plen = 0;
+	int clen = strlen(cmd) + 1;
 	char *search, *p;
 	static char path[PATH_MAX];
 
