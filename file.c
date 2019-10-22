@@ -793,6 +793,8 @@ rpc_file_exec_run(const char *cmd, const struct blob_attr *sid,
 {
 	pid_t pid;
 
+	int r;
+	int saved_errno;
 	int devnull;
 	int opipe[2];
 	int epipe[2];
@@ -817,11 +819,6 @@ rpc_file_exec_run(const char *cmd, const struct blob_attr *sid,
 
 	if (!rpc_file_access(sid, executable, "exec"))
 		return UBUS_STATUS_PERMISSION_DENIED;
-
-	c = malloc(sizeof(*c));
-
-	if (!c)
-		return UBUS_STATUS_UNKNOWN_ERROR;
 
 	if (pipe(opipe))
 		goto fail_opipe;
@@ -899,11 +896,19 @@ rpc_file_exec_run(const char *cmd, const struct blob_attr *sid,
 			}
 		}
 
-		if (execv(executable, args))
+		r = execv(executable, args);
+		saved_errno = errno;
+		free(args);
+		if (r) {
+			errno = saved_errno;
 			return rpc_errno_status();
+		}
 
+		break;
 	default:
-		memset(c, 0, sizeof(*c));
+		c = calloc(1, sizeof(*c));
+		if (!c)
+			return rpc_errno_status();
 
 		ustream_declare(c->opipe, opipe[0], exec_opipe);
 		ustream_declare(c->epipe, epipe[0], exec_epipe);
@@ -920,6 +925,7 @@ rpc_file_exec_run(const char *cmd, const struct blob_attr *sid,
 
 		c->context = ctx;
 		ubus_defer_request(ctx, req, &c->request);
+		free(c);
 	}
 
 	return UBUS_STATUS_OK;
@@ -931,7 +937,6 @@ fail_epipe:
 	close(opipe[0]);
 	close(opipe[1]);
 fail_opipe:
-	free(c);
 	return rpc_errno_status();
 }
 
