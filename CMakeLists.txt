@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 INCLUDE(CheckFunctionExists)
 
 PROJECT(rpcd C)
-ADD_DEFINITIONS(-Os -Wall -Werror --std=gnu99 -g3 -Wmissing-declarations)
+ADD_DEFINITIONS(-Os -Wextra -Wall -Werror --std=gnu99 -g3)
+ADD_DEFINITIONS(-Wno-unused-parameter -Wmissing-declarations)
 INCLUDE_DIRECTORIES(include)
 
 OPTION(FILE_SUPPORT "File plugin support" ON)
