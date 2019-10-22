@@ -295,11 +295,6 @@ rpc_exec(const char **args, rpc_exec_write_cb_t in,
 	if (!cmd)
 		return UBUS_STATUS_NOT_FOUND;
 
-	c = malloc(sizeof(*c));
-
-	if (!c)
-		return UBUS_STATUS_UNKNOWN_ERROR;
-
 	if (pipe(ipipe))
 		goto fail_ipipe;
 
@@ -332,7 +327,10 @@ rpc_exec(const char **args, rpc_exec_write_cb_t in,
 			return rpc_errno_status();
 
 	default:
-		memset(c, 0, sizeof(*c));
+		c = calloc(1, sizeof(*c));
+		if (!c)
+			return rpc_errno_status();
+
 		blob_buf_init(&c->blob, 0);
 
 		c->stdin_cb  = in;
@@ -367,6 +365,7 @@ rpc_exec(const char **args, rpc_exec_write_cb_t in,
 
 		c->context = ctx;
 		ubus_defer_request(ctx, req, &c->request);
+		free(c);
 	}
 
 	return UBUS_STATUS_OK;
@@ -384,6 +383,5 @@ fail_opipe:
 	close(ipipe[1]);
 
 fail_ipipe:
-	free(c);
 	return rpc_errno_status();
 }
